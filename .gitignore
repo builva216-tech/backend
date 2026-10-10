@@ -1,0 +1,26 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+media/
+staticfiles/
+.pytest_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+
+.env.local
+hosting/origin.env
+
+hosting/secrets/
+*service-account*.json
+
+# Keep deployment credentials out of source control.
+.env.*
+*.env
+*.env.*
+!.env.example
+!*.env.example
+*.pem
+*.key

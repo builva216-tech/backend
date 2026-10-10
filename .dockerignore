@@ -1,0 +1,17 @@
+.env
+.env.*
+.venv
+__pycache__
+media
+.git
+staticfiles
+
+hosting/secrets
+*service-account*.json
+
+*.env
+*.env.*
+*.sqlite3
+*.zip
+*.pem
+*.key

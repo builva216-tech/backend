@@ -1,0 +1,66 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: carrent_tn
+      POSTGRES_USER: carrent_tn
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run tools/hosting.py configure first}
+    volumes:
+      - origin_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carrent_tn -d carrent_tn"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - origin_cache:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  api:
+    build:
+      context: ..
+      dockerfile: hosting/Dockerfile
+    image: carrent-tn-origin:local
+    restart: unless-stopped
+    env_file: origin.env
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - origin_media:/app/media
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    command: ["sh", "-c", "python manage.py collectstatic --noinput && exec gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 60 --access-logfile -"]
+  mail:
+    image: carrent-tn-origin:local
+    restart: unless-stopped
+    env_file: origin.env
+    command: ["python", "manage.py", "send_password_recovery_emails", "--watch"]
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+  push:
+    image: carrent-tn-origin:local
+    profiles: [push]
+    restart: unless-stopped
+    env_file: origin.env
+    environment:
+      FCM_CREDENTIALS_FILE: /run/secrets/firebase-service-account.json
+    volumes:
+      - ./secrets/firebase-service-account.json:/run/secrets/firebase-service-account.json:ro
+    command: ["python", "manage.py", "send_push_notifications", "--watch"]
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+volumes:
+  origin_db:
+  origin_cache:
+  origin_media:

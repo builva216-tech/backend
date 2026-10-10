@@ -1,0 +1,89 @@
+from django.urls import path
+
+from .customer_relationship_views import (
+    AgencyCustomerContactView,
+    AgencyCustomerSummaryView,
+)
+from .views import (
+    AgencyBookingApproveView,
+    AgencyBookingDetailView,
+    AgencyBookingListView,
+    AgencyBookingPickupView,
+    AgencyBookingRejectView,
+    AgencyBookingReturnView,
+    BookingQuoteView,
+    CustomerBookingCancelView,
+    CustomerBookingConfirmView,
+    CustomerBookingDetailView,
+    CustomerBookingListCreateView,
+)
+
+app_name = "bookings-api"
+
+urlpatterns = [
+    path(
+        "agency/<uuid:booking_id>/customer-summary/",
+        AgencyCustomerSummaryView.as_view(),
+        name="agency-customer-summary",
+    ),
+    path(
+        "agency/<uuid:booking_id>/customer-contact/",
+        AgencyCustomerContactView.as_view(),
+        name="agency-customer-contact",
+    ),
+    path(
+        "quote/",
+        BookingQuoteView.as_view(),
+        name="quote",
+    ),
+    path(
+        "customer/",
+        CustomerBookingListCreateView.as_view(),
+        name="customer-list-create",
+    ),
+    path(
+        "customer/<uuid:booking_id>/",
+        CustomerBookingDetailView.as_view(),
+        name="customer-detail",
+    ),
+    path(
+        "customer/<uuid:booking_id>/confirm/",
+        CustomerBookingConfirmView.as_view(),
+        name="customer-confirm",
+    ),
+    path(
+        "customer/<uuid:booking_id>/cancel/",
+        CustomerBookingCancelView.as_view(),
+        name="customer-cancel",
+    ),
+    path(
+        "agency/",
+        AgencyBookingListView.as_view(),
+        name="agency-list",
+    ),
+    path(
+        "agency/<uuid:booking_id>/",
+        AgencyBookingDetailView.as_view(),
+        name="agency-detail",
+    ),
+    path(
+        "agency/<uuid:booking_id>/approve/",
+        AgencyBookingApproveView.as_view(),
+        name="agency-approve",
+    ),
+    path(
+        "agency/<uuid:booking_id>/reject/",
+        AgencyBookingRejectView.as_view(),
+        name="agency-reject",
+    ),
+    path(
+        "agency/<uuid:booking_id>/pickup/",
+        AgencyBookingPickupView.as_view(),
+        name="agency-pickup",
+    ),
+    path(
+        "agency/<uuid:booking_id>/return/",
+        AgencyBookingReturnView.as_view(),
+        name="agency-return",
+    ),
+]
